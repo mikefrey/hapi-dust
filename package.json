@@ -1,0 +1,32 @@
+{
+  "name": "hapi-dust",
+  "version": "1.0.0",
+  "description": "dust.js templating for hapi",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikefrey/hapi-dust.git"
+  },
+  "keywords": [
+    "hapi",
+    "hapijs",
+    "dust",
+    "dustjs",
+    "template",
+    "templating",
+    "views",
+    "view"
+  ],
+  "author": "Mike Frey <frey.mike@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mikefrey/hapi-dust/issues"
+  },
+  "homepage": "https://github.com/mikefrey/hapi-dust",
+  "devDependencies": {
+    "dustjs-linkedin": "^2.4.0"
+  }
+}
