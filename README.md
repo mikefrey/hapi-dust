@@ -25,7 +25,7 @@ If you're using `dustjs-linkedin`, `hapi-dust` will also try to load
 support.
 
 ```
-npm install dustjs-linkedin --save
+npm install dustjs-helpers --save
 ```
 
 ## Usage
