@@ -14,12 +14,24 @@ catch (ex) {
 
 if (!dust) throw new Error('"dustjs-linkedin" or "dust" module not found')
 
+var getBaseDir = function(options) {
+  if (options && options.baseDir)
+    return options.baseDir
+  return ''
+}
+
+var getTemplateExt = function(options) {
+  if (options && options.defaultExt && options.defaultExt.length > 0)
+    return '.' + options.defaultExt
+  return '.dust'
+}
+
 module.exports = {
   module: {
     compile: function(template, options, callback) {
-      var fileExtension = options.defaultExtension || 'dust'
       dust.onLoad = function(name, callback) {
-          fs.readFile(Path.join(options.basedir, name + '.' + fileExtension), function(err, data) {
+        var templateFile = Path.join(getBaseDir(options), name + getTemplateExt(options))
+        fs.readFile(templateFile, function(err, data) {
           if (err)
             throw err
           callback(err, data.toString())
