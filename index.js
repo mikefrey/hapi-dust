@@ -21,16 +21,13 @@ module.exports = {
 
       var compiled = dust.compileFn(template, options && options.name)
 
-      // process.nextTick(function() {
-
-        callback(null, function(context, options, callback) {
-          compiled(context, callback)
-        })
-      // })
+      callback(null, function(context, options, callback) {
+        compiled(context, callback)
+      })
     },
 
     registerPartial: function(name, data) {
-      var compiled = dust.compileFn(data, name)
+      dust.compileFn(data, name)
     },
 
     registerHelper: function(name, helper) {
