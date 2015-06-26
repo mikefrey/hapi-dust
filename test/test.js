@@ -4,6 +4,15 @@ var dust = require('../index')
 
 var options = {baseDir: "test/templates"}
 
+function registerPartial(name, path) {
+  var fs = require('fs')
+  var file = fs.readFileSync(path, { encoding: 'utf8' })
+  dust.module.registerPartial(name, file)
+}
+
+registerPartial('_include', __dirname+'/templates/_include.dust')
+registerPartial('_layout', __dirname+'/templates/_layout.dust')
+
 assert(dust.module, 'module does not exist')
 assert(dust.module.compile, 'compile does not exist')
 assert.equal(dust.compileMode, 'async', 'compileMode not properly set')

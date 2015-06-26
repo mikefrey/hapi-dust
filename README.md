@@ -33,10 +33,11 @@ npm install dustjs-helpers --save
 Load `hapi-dust` in your hapi server views configuration:
 
 ```js
-var server = new Hapi.Server(1337, {
-  views: {
-    engines: { html: require('hapi-dust') },
-    path: __dirname + '/path/to/templates'
-  }
+server.views({
+  engines: { dust: require('hapi-dust') },
+  relativeTo: Path.join(__dirname),
+  path: 'path/to/templates',
+  partialsPath: 'path/to/partials',
+  helpersPath: 'path/to/helpers',
 })
 ```
