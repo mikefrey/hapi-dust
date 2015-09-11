@@ -188,6 +188,63 @@ describe('Rendering', function () {
         });
     });
 
+    it('loads partials and is able to render them', function (done) {
+
+        var server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { dust: HapiDust },
+            path: __dirname + '/templates/valid',
+            partialsPath: __dirname + '/templates/valid/partials'
+        });
+
+        server.render('testPartials', {}, function (err, rendered, config) {
+
+            expect(rendered).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+            done();
+        });
+    });
+
+    it('loads partials and is able to render them (streaming)', function (done) {
+
+        var server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { dust: HapiDust },
+            path: __dirname + '/templates/valid',
+            partialsPath: __dirname + '/templates/valid/partials'
+        });
+
+        var options = {
+            runtimeOptions: {
+                streaming: true
+            }
+        };
+
+        server.render('testPartials', {}, options, function (err, rendered, config) {
+
+            var buf = '';
+            var finished = false;
+
+            rendered.on('data', function (data) {
+
+                buf += data;
+            }).on('end', function () {
+
+                if (finished === false) {
+
+                    finished = true;
+                    expect(buf).to.equal(' Nav:<nav>Nav</nav>|<nav>Nested</nav>');
+                    done();
+                }
+            });
+        });
+    });
+
     it('errors on a malformed template', function (done) {
 
         var server = new Hapi.Server();
@@ -229,5 +286,7 @@ describe('Rendering', function () {
             done();
         });
     });
+
+
 
 });
