@@ -1,42 +1,75 @@
-var dust
-var fs = require('fs')
-var Path = require('path')
+// Load modules
 
-try {
-  dust = require('dustjs-linkedin')
-  try { require('dustjs-helpers') }
-  catch (ex) {}
-}
-catch (ex) {
-  try { dust = require('dust') }
-  catch (ex) {}
-}
+var Dust = require('dustjs-helpers');
 
-if (!dust) throw new Error('"dustjs-linkedin" or "dust" module not found')
+// Declare internals
 
-module.exports = {
-  module: {
+var internals = {};
 
-    compile: function(template, options, callback) {
 
-      var compiled = dust.compileFn(template, options && options.name)
+internals.render = function (tmpl) {
 
-      callback(null, function(context, options, callback) {
-        compiled(context, callback)
-      })
-    },
+    return function (context, options, callback) {
 
-    registerPartial: function(name, data) {
-      dust.compileFn(data, name)
-    },
+        if (options.streaming) {
+            var err = null;
 
-    registerHelper: function(name, helper) {
-      if (helper.length > 1)
-        dust.helpers[name] = helper
-      else
-        dust.filters[name] = helper
+            try {
+                var stream = tmpl(context);
+            } catch (e) {
+                err = e;
+            }
+
+            callback(err, stream);
+        } else {
+            tmpl(context, callback);
+        }
+    };
+};
+
+// Declare module
+
+exports.module = {};
+
+
+exports.module.compile = function (template, options, callback) {
+
+    var err = null;
+
+    try {
+        var tmpl = Dust.compileFn(template, options.filename);
+    } catch (e) {
+        err = e;
     }
 
-  },
-  compileMode: 'async'
-}
+    var renderFn = internals.render(tmpl);
+
+    callback(err, renderFn);
+};
+
+exports.module.prepare = function (config, next) {
+
+    var err = null;
+
+    if (config.compileMode !== 'async') {
+        err = new Error('compileMode must be async for hapi-Dust');
+    }
+
+    next(err);
+};
+
+exports.module.registerPartial = function (name, src) {
+
+    var tmpl = Dust.compileFn(src, name);
+};
+
+exports.module.registerHelper = function (name, helper) {
+
+    if (helper.length > 1) {
+        Dust.helpers[name] = helper;
+    } else {
+        Dust.filters[name] = helper;
+    }
+};
+
+exports.compileMode = 'async';
