@@ -4,7 +4,8 @@
   "description": "dust.js templating for hapi",
   "main": "index.js",
   "scripts": {
-    "test": "node test/test.js"
+    "test": "lab -a code -t 100 -L",
+    "test-cov-html": "lab -a code -r html -o coverage.html"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,15 @@
     "url": "https://github.com/mikefrey/hapi-dust/issues"
   },
   "homepage": "https://github.com/mikefrey/hapi-dust",
+  "dependencies": {
+    "dustjs-helpers": "^1.7.3",
+    "dustjs-linkedin": "^2.7.2"
+  },
   "devDependencies": {
-    "dustjs-linkedin": "^2.4.0"
+    "code": "^1.5.0",
+    "hapi": "^9.3.0",
+    "hoek": "^2.14.0",
+    "lab": "^5.16.0",
+    "vision": "^3.0.0"
   }
 }
