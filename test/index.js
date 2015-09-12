@@ -302,6 +302,63 @@ describe('Rendering', function () {
         });
     });
 
+    it('loads filters and is able to render them', function (done) {
+
+        var server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { dust: HapiDust },
+            path: __dirname + '/templates/valid',
+            helpersPath: __dirname + '/templates/valid/filters'
+        });
+
+        server.render('testFilters', { something: 'uppercase' }, function (err, rendered, config) {
+
+            expect(rendered).to.equal('<p>It is almost never a good idea to UPPERCASE text in HTML!</p>');
+            done();
+        });
+    });
+
+    it('loads filters and is able to render them (streaming)', function (done) {
+
+        var server = new Hapi.Server();
+        server.connection();
+        server.register(Vision, Hoek.ignore);
+
+        server.views({
+            engines: { dust: HapiDust },
+            path: __dirname + '/templates/valid',
+            helpersPath: __dirname + '/templates/valid/filters'
+        });
+
+        var options = {
+            runtimeOptions: {
+                streaming: true
+            }
+        };
+
+        server.render('testFilters', { something: 'uppercase' }, options, function (err, rendered, config) {
+
+            var buf = '';
+            var finished = false;
+
+            rendered.on('data', function (data) {
+
+                buf += data;
+            }).on('end', function () {
+
+                if (finished === false) {
+
+                    finished = true;
+                    expect(buf).to.equal('<p>It is almost never a good idea to UPPERCASE text in HTML!</p>');
+                    done();
+                }
+            });
+        });
+    });
+
     it('errors on a malformed template', function (done) {
 
         var server = new Hapi.Server();
