@@ -12,18 +12,17 @@ internals.render = function (tmpl) {
     return function (context, options, callback) {
 
         if (options.streaming) {
-            var err = null;
 
             try {
                 var stream = tmpl(context);
-            } catch (e) {
-                err = e;
+            } catch (err) {
+                return callback(err, null);
             }
 
-            callback(err, stream);
-        } else {
-            tmpl(context, callback);
+            return callback(null, stream);
         }
+
+        return tmpl(context, callback);
     };
 };
 
@@ -34,17 +33,15 @@ exports.module = {};
 
 exports.module.compile = function (template, options, callback) {
 
-    var err = null;
-
     try {
         var tmpl = Dust.compileFn(template, options.filename);
-    } catch (e) {
-        err = e;
+    } catch (err) {
+        return callback(err, null);
     }
 
     var renderFn = internals.render(tmpl);
 
-    callback(err, renderFn);
+    return callback(null, renderFn);
 };
 
 exports.module.prepare = function (config, next) {
