@@ -58,7 +58,7 @@ exports.module.prepare = function (config, next) {
 exports.module.registerPartial = function (name, src) {
 
     try {
-        Dust.compileFn(src, name);
+        Dust.loadSource(Dust.compile(src, name));
     } catch (err) { }
 };
 
