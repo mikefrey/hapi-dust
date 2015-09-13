@@ -13,10 +13,12 @@ internals.render = function (tmpl) {
 
         if (options.streaming) {
 
+            var stream = null;
+
             try {
-                var stream = tmpl(context);
+                stream = tmpl(context);
             } catch (err) {
-                return callback(err, null);
+                return callback(err);
             }
 
             return callback(null, stream);
@@ -33,31 +35,29 @@ exports.module = {};
 
 exports.module.compile = function (template, options, callback) {
 
+    var tmpl = null;
+
     try {
-        var tmpl = Dust.compileFn(template, options.filename);
+        tmpl = Dust.compileFn(template, options.filename);
     } catch (err) {
-        return callback(err, null);
+        return callback(err);
     }
 
-    var renderFn = internals.render(tmpl);
-
-    return callback(null, renderFn);
+    return callback(null, internals.render(tmpl));
 };
 
 exports.module.prepare = function (config, next) {
 
-    var err = null;
-
     if (config.compileMode !== 'async') {
-        err = new Error('compileMode must be async for hapi-Dust');
+        return next(new Error('compileMode must be async for hapi-Dust'));
     }
 
-    next(err);
+    return next();
 };
 
 exports.module.registerPartial = function (name, src) {
 
-    var tmpl = Dust.compileFn(src, name);
+    return Dust.compileFn(src, name);
 };
 
 exports.module.registerHelper = function (name, helper) {
