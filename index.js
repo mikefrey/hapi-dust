@@ -57,7 +57,9 @@ exports.module.prepare = function (config, next) {
 
 exports.module.registerPartial = function (name, src) {
 
-    return Dust.compileFn(src, name);
+    try {
+        Dust.compileFn(src, name);
+    } catch (err) { }
 };
 
 exports.module.registerHelper = function (name, helper) {
