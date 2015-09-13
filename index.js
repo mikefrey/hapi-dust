@@ -7,7 +7,7 @@ var Dust = require('dustjs-helpers');
 var internals = {};
 
 
-internals.render = function (tmpl) {
+internals.render = function (compiled) {
 
     return function (context, options, callback) {
 
@@ -16,7 +16,7 @@ internals.render = function (tmpl) {
             var stream = null;
 
             try {
-                stream = tmpl(context);
+                stream = compiled(context);
             } catch (err) {
                 return callback(err);
             }
@@ -24,7 +24,7 @@ internals.render = function (tmpl) {
             return callback(null, stream);
         }
 
-        return tmpl(context, callback);
+        return compiled(context, callback);
     };
 };
 
@@ -35,15 +35,15 @@ exports.module = {};
 
 exports.module.compile = function (template, options, callback) {
 
-    var tmpl = null;
+    var compiled = null;
 
     try {
-        tmpl = Dust.compileFn(template, options.filename);
+        compiled = Dust.compileFn(template, options.filename);
     } catch (err) {
         return callback(err);
     }
 
-    return callback(null, internals.render(tmpl));
+    return callback(null, internals.render(compiled));
 };
 
 exports.module.prepare = function (config, next) {
