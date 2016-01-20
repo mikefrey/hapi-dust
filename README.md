@@ -1,4 +1,4 @@
-hapi-dust
+hapi-dust [![Travis CI](https://travis-ci.org/mikefrey/hapi-dust.svg)](https://travis-ci.org/mikefrey/hapi-dust)
 =========
 
 dust.js + hapi
