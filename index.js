@@ -1,42 +1,74 @@
-var dust
-var fs = require('fs')
-var Path = require('path')
+// Load modules
 
-try {
-  dust = require('dustjs-linkedin')
-  try { require('dustjs-helpers') }
-  catch (ex) {}
-}
-catch (ex) {
-  try { dust = require('dust') }
-  catch (ex) {}
-}
+var Dust = require('dustjs-helpers');
 
-if (!dust) throw new Error('"dustjs-linkedin" or "dust" module not found')
+// Declare internals
 
-module.exports = {
-  module: {
+var internals = {};
 
-    compile: function(template, options, callback) {
 
-      var compiled = dust.compileFn(template, options && options.name)
+internals.render = function (compiled) {
 
-      callback(null, function(context, options, callback) {
-        compiled(context, callback)
-      })
-    },
+    return function (context, options, callback) {
 
-    registerPartial: function(name, data) {
-      dust.compileFn(data, name)
-    },
+        if (options.streaming) {
 
-    registerHelper: function(name, helper) {
-      if (helper.length > 1)
-        dust.helpers[name] = helper
-      else
-        dust.filters[name] = helper
+            var stream = null;
+
+            try {
+                stream = compiled(context);
+            } catch (err) {
+                return callback(err);
+            }
+
+            return callback(null, stream);
+        }
+
+        return compiled(context, callback);
+    };
+};
+
+// Declare module
+
+exports.module = {};
+
+
+exports.module.compile = function (template, options, callback) {
+
+    var compiled = null;
+
+    try {
+        compiled = Dust.compileFn(template, options.filename);
+    } catch (err) {
+        return callback(err);
     }
 
-  },
-  compileMode: 'async'
-}
+    return callback(null, internals.render(compiled));
+};
+
+exports.module.prepare = function (config, next) {
+
+    if (config.compileMode !== 'async') {
+        return next(new Error('compileMode must be async for hapi-Dust'));
+    }
+
+    return next();
+};
+
+exports.module.registerPartial = function (name, src) {
+
+    try {
+        Dust.loadSource(Dust.compile(src, name));
+    } catch (err) { }
+};
+
+exports.module.registerHelper = function (name, helper) {
+
+    if (helper.length > 1) {
+        Dust.helpers[name] = helper;
+    } else {
+        Dust.filters[name] = helper;
+    }
+};
+
+exports.compileMode = 'async';
